@@ -1,0 +1,113 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45px;
+  background-color: #438eb9;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 15px;
+}
+
+.navbar-header {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand {
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-brand:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+.navbar-brand small {
+  font-size: 16px;
+}
+
+.navbar-brand i {
+  font-size: 20px;
+}
+
+.menu-toggler {
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 8px 10px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.menu-toggler .icon-bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: #fff;
+  margin: 4px 0;
+}
+
+.navbar-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.ace-nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.ace-nav > li > a {
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background-color 0.2s;
+  border-radius: 3px;
+}
+
+.ace-nav > li > a:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+
+.ace-nav > li.green > a {
+  color: #fff;
+}
+
+.ace-nav > li.grey > a {
+  color: #fff;
+}
+
+.ace-nav i.red {
+  color: #ff4444;
+}
+
+/* Offset body for fixed header */
+body {
+  padding-top: 45px;
+}
+
+.main-container {
+  margin-top: 45px;
+}

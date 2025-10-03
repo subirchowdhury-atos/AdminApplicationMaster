@@ -1,0 +1,17 @@
+<div>
+    <h2>Congratulations! Your Loan Application Has Been Approved</h2>
+    <p>Dear <span th:text="${firstName + ' ' + lastName}">Applicant</span>,</p>
+    <p>We're pleased to inform you that your loan application (#<span th:text="${applicationId}">12345</span>) has been approved.</p>
+    
+    <h3>Loan Details:</h3>
+    <ul>
+        <li>Loan Amount: $<span th:text="${loanAmount}">10,000</span></li>
+        <li>Application Date: <span th:text="${applicationDate}">2025-01-01</span></li>
+        <li>Status: <strong>APPROVED</strong></li>
+    </ul>
+    
+    <p>Next steps will be communicated to you shortly.</p>
+    <p>
+        <a th:href="${applicationUrl}" class="button">View Application Details</a>
+    </p>
+</div>

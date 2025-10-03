@@ -1,0 +1,8 @@
+[[${companyName ?: 'Admin Application Master'}]]
+=====================================
+
+[[${content}]]
+
+-------------------------------------
+This is an automated message. Please do not reply to this email.
+[[${companyAddress ?: '123 Business St, City, State 12345'}]]

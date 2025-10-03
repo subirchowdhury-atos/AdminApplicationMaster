@@ -1,0 +1,14 @@
+<div>
+    <h2>Loan Application Update</h2>
+    <p>Dear <span th:text="${firstName + ' ' + lastName}">Applicant</span>,</p>
+    <p>Thank you for your interest in our loan services. After careful review, we regret to inform you that your loan application (#<span th:text="${applicationId}">12345</span>) has not been approved at this time.</p>
+    
+    <h3>Application Details:</h3>
+    <ul>
+        <li>Application ID: #<span th:text="${applicationId}">12345</span></li>
+        <li>Requested Amount: $<span th:text="${loanAmount}">10,000</span></li>
+        <li>Application Date: <span th:text="${applicationDate}">2025-01-01</span></li>
+    </ul>
+    
+    <p>You may reapply after 90 days. If you have questions about this decision, please contact our support team.</p>
+</div>

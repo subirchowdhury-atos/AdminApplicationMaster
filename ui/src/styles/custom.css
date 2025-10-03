@@ -1,0 +1,120 @@
+.pagination a, .pagination span.current, .pagination span.gap {
+	float: left;
+	padding: 0 14px;
+	line-height: 38px;
+	text-decoration: none;
+	background-color: white;
+	border: 1px solid #DDD;
+	border-left-width: 0;
+}
+
+.pagination {
+	border-left: 1px solid #ddd;
+	.first{
+		padding : 0;
+		float: none;
+		border: none;
+	}
+	.prev {
+		padding : 0;
+		float: none;
+		border: none;
+	}
+	.page{
+		padding : 0;
+		float: none;
+		border: none;
+	}
+	.next{
+		padding : 0;
+		float: none;
+		border: none;
+	}
+	.last{
+		padding : 0;
+		float: none;
+		border: none;
+	}
+}
+
+
+
+.field_with_errors .message{color:red; padding-left: 5px;}
+#bagTable{width: 100%}
+#bagTable td{border:1px solid #C4C4C4;width: 0%;text-align: center;vertical-align: middle;}
+#bagTable th{background-color: #4cb1ca;width: 18%;font-weight: bold;text-transform: uppercase;}
+
+#bagTable tr{border-bottom: 1px solid #C4C4C4}
+h4.title {font-weight: bold}
+h3.alert {font-weight: bold; color:red; letter-spacing: -1px; text-transform: uppercase; border-bottom: 1px solid #dfdddd;font-size: 1.4em;margin-bottom: 0.5em;padding-bottom: 13px;text-align: center;}
+h3.message {font-weight: bold; color:red; letter-spacing: -1px; border-bottom: 1px solid #dfdddd;font-size: 1em;margin-bottom: 0.5em;padding-bottom: 13px;text-align: center;}
+
+#bagTable .field input[type='text']{width: 40px;padding: 5px;text-align: center;}
+
+a.button_with_image_save {display:block;cursor: pointer;width:30px;height:30px;text-indent: 35%;}
+
+.link-btn{
+    background: #4cb1ca none repeat scroll 0 0;
+    border: medium none;
+    color: #fff;
+    cursor: pointer;
+    font-family: "Exo 2",sans-serif;
+    font-size: 1em;
+    outline: medium none;
+    padding: 10px 30px;
+}
+
+.pull-right {float: right; }
+
+.page-container {
+    border-top: 1px solid #ddd;
+    margin: 2% 5%;
+}
+
+.page-container .inner-page-contain{background: #f7f7f7 none repeat scroll 0 0;
+    display: block;
+    float: left;padding: 2%;
+    width: 96%;}
+
+.inner-page-contain table{
+    margin-top: 0;
+    padding-left: 25px;
+    padding-top: 23px;
+    width: 68%;
+}
+
+
+
+.Edit-account form input[type="text"], .Edit-account form select, .Edit-account input[type="password"] {
+    border: medium none;
+    box-shadow: 0 0 2px #aaa;
+    color: #777;
+    font-family: "Exo 2",sans-serif;
+    font-size: 0.95em;
+    margin: 10px 0;
+    outline: medium none;
+    padding: 8px;
+    width: 91%;
+}
+
+.entry:not(:first-of-type)
+{
+    margin-top: 10px;
+}
+
+.glyphicon
+{
+    font-size: 12px;
+}
+
+.delete-lk {
+  position: relative;
+}
+
+.del-chk {
+  bottom: 16px;
+  position: absolute;
+  right: -85px;
+}
+
+.hidden_option{display: none; }

@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/admin_app_db
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update # Auto-create/update schema in dev
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Hot reload for development (replaces config.file_watcher)
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+  # Development secret key (from Rails secrets.yml)
+  security:
+    secret-key: f0e4cfe92ab9bbfe8f8aacb3c9d06aa5f70f73177ffb27238c801ea6c0890e71c77098ae778adc3cd3f7b2e434c7f34433fd861ba987c798afa73948e2632970
+
+# Show full error details in development (config.consider_all_requests_local = true)
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: always
+    include-exception: true
+
+logging:
+  level:
+    root: INFO
+    com.adminapplicationmaster: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+server:
+  port: 8080

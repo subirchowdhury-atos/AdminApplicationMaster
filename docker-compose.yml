@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: admin-app-postgres
+    environment:
+      POSTGRES_DB: admin_app_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/main/resources/data/create_schema.sql:/docker-entrypoint-initdb.d/01-create_schema.sql
+      - ./src/main/resources/data/seed_data.sql:/docker-entrypoint-initdb.d/02-seed_data.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  # Spring Boot Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: admin-app-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Database configuration
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/admin_app_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      
+      # JPA/Hibernate
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      
+      # Active profile
+      SPRING_PROFILES_ACTIVE: local
+      
+      # Security
+      SECRET_KEY_BASE: f0e4cfe92ab9bbfe8f8aacb3c9d06aa5f70f73177ffb27238c801ea6c0890e71c77098ae778adc3cd3f7b2e434c7f34433fd861ba987c798afa73948e2632970
+      
+      # External services (update with your actual values)
+      DECISION_SERVICE_HOST: ${DECISION_SERVICE_HOST:-http://decision-service:8081}
+      DECISION_SERVICE_API_TOKEN: ${DECISION_SERVICE_API_TOKEN:-your-decision-token}
+      LOCATION_SERVICE_HOST: ${LOCATION_SERVICE_HOST:-http://location-service:8082}
+      LOCATION_SERVICE_API_TOKEN: ${LOCATION_SERVICE_API_TOKEN:-your-location-token}
+      
+      # Encryption
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-default-encryption-key-change-in-production}
+      
+      # Server
+      SERVER_PORT: 8080
+      
+      # Logging
+      LOGGING_LEVEL_ROOT: INFO
+      LOGGING_LEVEL_COM_ADMINAPPLICATIONMASTER: DEBUG
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # PgAdmin (Optional - for database management)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: admin-app-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - app-network
+    depends_on:
+      - postgres
+    profiles:
+      - tools
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

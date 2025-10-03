@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  flyway:
+    enabled: false
+
+  # Test secret key (from Rails secrets.yml)
+  security:
+    secret-key: 4c5274c56ba512bfbe7787affd6be79a5c86ef246526cfd9059f08b3d82fea2aca0ddcdc310b1ef878aff6963b19b914520991ea9fd80905e9d1863dddf5fa09
+
+
+encryption:
+  key: test-encryption-key-must-be-32-chars-long!!!
+
+
+# Show full error details in tests (config.consider_all_requests_local = true)
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: always
+    include-exception: true
+
+# Test-specific settings (config.action_controller.allow_forgery_protection = false)
+security:
+  csrf:
+    enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.adminapplicationmaster: WARN
+    org.springframework.test: WARN
+    org.hibernate.SQL: DEBUG

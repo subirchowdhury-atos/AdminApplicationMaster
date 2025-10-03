@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${emailTitle ?: 'Email'}">Email</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .footer {
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666666;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header" th:if="${showHeader != false}">
+            <h1 th:text="${companyName ?: 'Admin Application Master'}">Admin Application Master</h1>
+        </div>
+        
+        <!-- Main content -->
+        <th:block th:insert="~{${contentTemplate}}"></th:block>
+        
+        <div class="footer" th:if="${showFooter != false}">
+            <p>This is an automated message. Please do not reply to this email.</p>
+            <p th:text="${companyAddress ?: '123 Business St, City, State 12345'}">123 Business St, City, State 12345</p>
+        </div>
+    </div>
+</body>
+</html>
