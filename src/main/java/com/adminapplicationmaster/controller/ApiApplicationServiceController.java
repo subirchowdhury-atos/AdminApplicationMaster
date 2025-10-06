@@ -115,7 +115,6 @@ public class ApiApplicationServiceController {
                     if (loanApplication.getAddress() != null) {
                         existing.setAddress(loanApplication.getAddress());
                     }
-                    // Note: address is NOT updated if null - keeps existing value
                     
                     // Only update status if provided
                     if (loanApplication.getStatus() != null) {
@@ -132,37 +131,73 @@ public class ApiApplicationServiceController {
 
     @GetMapping("/{id}/decision_check")
     public ResponseEntity<?> decisionCheck(@PathVariable Long id) {
+        log.info("Decision check requested for loan application ID: {}", id);
+        
         try {
             LoanApplication loanApplication = loanApplicationRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Loan application not found"));
 
+            log.info("Found loan application: {} {}", loanApplication.getFirstName(), loanApplication.getLastName());
+
+            // Validate required fields
+            if (loanApplication.getSsn() == null || loanApplication.getSsn().isEmpty()) {
+                log.error("SSN is missing for loan application ID: {}", id);
+                return ResponseEntity.status(400)
+                        .body(Map.of("message", "SSN is required for decision check"));
+            }
+
+            if (loanApplication.getAddress() == null) {
+                log.error("Address is missing for loan application ID: {}", id);
+                return ResponseEntity.status(400)
+                        .body(Map.of("message", "Address is required for decision check"));
+            }
+
             // Create request payload
             Map<String, Object> requestPayload = createLoanApplicationPayload(loanApplication);
+            log.debug("Request payload created: {}", requestPayload);
             
             // Call decision service
+            log.info("Calling decision service...");
             ResponseEntity<String> response = decisionService.getDecision(requestPayload);
             
+            log.info("Decision service responded with status: {}", response.getStatusCode());
+            
             if (response.getStatusCode().is2xxSuccessful()) {
-                JsonNode responseBody = objectMapper.readTree(response.getBody());
+                String responseBody = response.getBody();
+                log.debug("Decision service response: {}", responseBody);
+                
+                JsonNode responseNode = objectMapper.readTree(responseBody);
+                
+                // Check if final_decision exists
+                JsonNode finalDecisionNode = responseNode.get("final_decision");
+                if (finalDecisionNode == null) {
+                    log.error("Response missing 'final_decision' field: {}", responseBody);
+                    return ResponseEntity.status(500)
+                            .body(Map.of("message", "Invalid response from decision service"));
+                }
                 
                 // Create application decision
                 ApplicationDecision decision = ApplicationDecision.builder()
                         .loanApplication(loanApplication)
                         .request(objectMapper.writeValueAsString(requestPayload))
-                        .response(response.getBody())
-                        .decision(responseBody.get("final_decision").asText())
+                        .response(responseBody)
+                        .decision(finalDecisionNode.asText())
                         .build();
                 
                 ApplicationDecision saved = applicationDecisionRepository.save(decision);
+                log.info("Application decision saved with ID: {}", saved.getId());
+                
                 return ResponseEntity.ok(saved);
             } else {
-                return ResponseEntity.status(400)
-                        .body(Map.of("message", "Decision Service error"));
+                log.error("Decision service returned error status: {} with body: {}", 
+                         response.getStatusCode(), response.getBody());
+                return ResponseEntity.status(response.getStatusCode())
+                        .body(Map.of("message", "Decision service error: " + response.getBody()));
             }
         } catch (Exception e) {
-            log.error("Error in decision check", e);
+            log.error("Error in decision check for loan application ID: {}", id, e);
             return ResponseEntity.status(500)
-                    .body(Map.of("message", "Decision Service error"));
+                    .body(Map.of("message", "Decision service error: " + e.getMessage()));
         }
     }
 
@@ -170,7 +205,7 @@ public class ApiApplicationServiceController {
         Map<String, Object> addressMap = new HashMap<>();
         if (app.getAddress() != null) {
             addressMap.put("street", app.getAddress().getStreet());
-            addressMap.put("unit_number", app.getAddress().getUnitNumber());
+            addressMap.put("unitNumber", app.getAddress().getUnitNumber());  // camelCase
             addressMap.put("city", app.getAddress().getCity());
             addressMap.put("state", app.getAddress().getState());
             addressMap.put("zip", app.getAddress().getZip());
@@ -178,16 +213,16 @@ public class ApiApplicationServiceController {
         }
 
         Map<String, Object> payload = new HashMap<>();
-        payload.put("application_id", app.getId());
-        payload.put("first_name", app.getFirstName());
-        payload.put("last_name", app.getLastName());
-        payload.put("date_of_birth", app.getDateOfBirth().toString());
+        payload.put("applicationId", app.getId());  // camelCase
+        payload.put("firstName", app.getFirstName());  // camelCase
+        payload.put("lastName", app.getLastName());  // camelCase
+        payload.put("dateOfBirth", app.getDateOfBirth() != null ? app.getDateOfBirth().toString() : null);  // camelCase
         payload.put("ssn", app.getSsn());
         payload.put("email", app.getEmail());
         payload.put("phone", app.getPhone());
         payload.put("income", app.getIncome());
-        payload.put("income_type", app.getIncomeType());
-        payload.put("requested_loan_amount", app.getRequestedLoanAmount());
+        payload.put("incomeType", app.getIncomeType());  // camelCase
+        payload.put("requestedLoanAmount", app.getRequestedLoanAmount());  // camelCase
         payload.put("address", addressMap);
         
         return payload;
