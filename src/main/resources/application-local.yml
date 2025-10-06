@@ -45,18 +45,19 @@ logging:
     org.hibernate.SQL: WARN
     org.hibernate.type.descriptor.sql.BasicBinder: WARN
 
-# External services - use mock/default values for local development
-decision:
+
+# External Service Configuration for Local Development
+location:
   service:
     host: http://localhost:8081
     api:
-      token: local-dev-token
+      token: ""
 
-location:
+decision:
   service:
     host: http://localhost:8082
     api:
-      token: local-dev-token
+      token: ""
 
 # Local encryption key
 encryption:

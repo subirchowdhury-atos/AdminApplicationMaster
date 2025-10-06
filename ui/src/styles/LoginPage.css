@@ -42,6 +42,10 @@
   padding: 40px 30px;
 }
 
+.login-body form {
+  margin-top: 30px;
+}
+
 .login-body h4 {
   color: #333;
   font-size: 18px;
@@ -60,24 +64,43 @@
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: #999;
+  color: #666;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.form-group input {
+.form-group label i {
+  font-size: 16px;
+}
+
+/* Target both .form-control class and any input in form-group */
+.form-group input,
+.form-group .form-control {
   width: 100%;
-  padding: 15px 15px 15px 45px;
+  padding: 15px 15px 15px 48px;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 15px;
   transition: all 0.3s;
+  box-sizing: border-box;
+  background-color: #fff;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group .form-control:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #7c6fd6;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input::placeholder,
+.form-group .form-control::placeholder {
+  color: #bbb;
 }
 
 .form-actions {

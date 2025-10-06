@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   # PostgreSQL Database
-  postgres:
+  admin-postgres:
     image: postgres:16-alpine
     container_name: admin-app-postgres
     environment:
@@ -17,7 +17,7 @@ services:
       - ./src/main/resources/data/create_schema.sql:/docker-entrypoint-initdb.d/01-create_schema.sql
       - ./src/main/resources/data/seed_data.sql:/docker-entrypoint-initdb.d/02-seed_data.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U admin-postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,7 +31,7 @@ services:
       dockerfile: Dockerfile
     container_name: admin-app-backend
     depends_on:
-      postgres:
+      admin-postgres:
         condition: service_healthy
     environment:
       # Database configuration

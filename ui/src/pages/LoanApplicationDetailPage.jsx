@@ -69,41 +69,48 @@ export function LoanApplicationDetailPage() {
           />
         )}
         
-        <div className="page-header">
-          <h1>
+        <div className="page-header" style={{ position: 'relative' }}>
+          <h1 style={{ display: 'inline-block', marginRight: '20px' }}>
             Loan Application
-            <small>
-              <i className="ace-icon fa fa-angle-double-right"></i>
-            </small>
-            <button 
-              onClick={handleCheckDecision}
-              className="btn btn-small btn-info pull-right"
-              disabled={checkingDecision}
-            >
-              {checkingDecision ? 'Checking...' : 'Check Decision'}
-            </button>
           </h1>
+          <button 
+            onClick={handleCheckDecision}
+            className="btn btn-info"
+            disabled={checkingDecision}
+            style={{
+              position: 'absolute',
+              right: '0',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              padding: '10px 20px',
+              fontSize: '14px',
+              backgroundColor: '#5087b9',
+              border: 'none',
+              borderRadius: '4px',
+              color: 'white',
+              cursor: checkingDecision ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {checkingDecision ? 'Checking...' : 'Check Decision'}
+          </button>
         </div>
         
-        <h2>
-          <i className="ace-icon fa fa-home"></i>&nbsp;
-          {loanApplication.address?.street}, {loanApplication.address?.state}, {loanApplication.address?.county} {loanApplication.address?.zip}
-        </h2>
-        
-        <h3 className={`label label-lg label-${getStatusClass(loanApplication.status)} arrowed-right`}>
-          Application Status: {capitalize(loanApplication.status)}
-        </h3>
+        <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', color: '#333' }}>
+            <i className="ace-icon fa fa-home" style={{ marginRight: '8px' }}></i>
+            {loanApplication.address?.street}, {loanApplication.address?.city}, {loanApplication.address?.state} {loanApplication.address?.zip}
+          </h3>
+          <span className={`label label-${getStatusClass(loanApplication.status)}`} style={{ fontSize: '14px', padding: '5px 12px' }}>
+            Status: {capitalize(loanApplication.status)}
+          </span>
+        </div>
         
         {loanApplication.lastApplicationDecision && 
-         loanApplication.lastApplicationDecision.decision === 'eligible' && (
-          <div className="row widget-box">
-            <DecisionDetails applicationDecision={loanApplication.lastApplicationDecision} />
-          </div>
+        loanApplication.lastApplicationDecision.decision === 'eligible' && (
+          <DecisionDetails applicationDecision={loanApplication.lastApplicationDecision} />
         )}
         
-        <div className="row widget-box">
-          <PersonalDetailsDisplay loanApplication={loanApplication} />
-        </div>
+        <PersonalDetailsDisplay loanApplication={loanApplication} />
       </div>
     </div>
   );

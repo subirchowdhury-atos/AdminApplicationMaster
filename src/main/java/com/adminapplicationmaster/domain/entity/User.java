@@ -38,7 +38,7 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @NotBlank
+    //@NotBlank
     @Column(name = "encrypted_password", nullable = false)
     private String encryptedPassword;
 

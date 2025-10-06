@@ -1,16 +1,25 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import '../../styles/Sidebar.css';
 
-/**
- * Sidebar Component
- * Replaces Rails _sidebar.html.erb
- */
 function Sidebar() {
   const location = useLocation();
 
   const isActive = (path) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
+
+  useEffect(() => {
+    // Restore sidebar state on component mount
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.querySelector('.main-content');
+    
+    if (savedState === 'true') {
+      sidebar?.classList.add('menu-min');
+      mainContent?.classList.add('expanded');
+    }
+  }, []);
 
   return (
     <div 

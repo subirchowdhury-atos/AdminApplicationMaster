@@ -1,16 +1,19 @@
 import { useAuth } from '../../hooks/useAuth';
 import '../../styles/Header.css';
 
-/**
- * Header Component
- * Replaces Rails _header.html.erb
- */
 function Header() {
   const { user, logout } = useAuth();
 
   const handleMenuToggle = () => {
     const sidebar = document.getElementById('sidebar');
+    const mainContent = document.querySelector('.main-content');
+    
     sidebar?.classList.toggle('menu-min');
+    mainContent?.classList.toggle('expanded');
+    
+    // Save state to localStorage
+    const isCollapsed = sidebar?.classList.contains('menu-min');
+    localStorage.setItem('sidebarCollapsed', isCollapsed);
   };
 
   return (
@@ -44,7 +47,7 @@ function Header() {
               <>
                 <li className="green">
                   <a href="#">
-                    Welcome: {user.firstName || 'User'}
+                    Welcome: {user.firstName || 'Admin'}
                   </a>
                 </li>
                 <li className="grey">

@@ -2,23 +2,29 @@ package com.adminapplicationmaster.controller;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import com.adminapplicationmaster.domain.entity.Address;
@@ -79,15 +85,72 @@ class ApiApplicationServiceControllerTest {
 
     @Test
     void index_shouldReturnAllLoanApplications() {
-        List<LoanApplication> applications = Arrays.asList(testApplication);
-        when(loanApplicationRepository.findAll()).thenReturn(applications);
+        // Create a Page object with test data
+        Page<LoanApplication> page = new PageImpl<>(Arrays.asList(testApplication));
+        
+        when(loanApplicationRepository.findAll(any(Pageable.class))).thenReturn(page);
 
-        ResponseEntity<List<LoanApplication>> response = controller.index();
+        ResponseEntity<?> response = controller.index(null, 0, 20);
 
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals(1, response.getBody().size());
-        assertEquals(testApplication, response.getBody().get(0));
-        verify(loanApplicationRepository).findAll();
+        assertNotNull(response.getBody());
+        
+        // The response body is now a Page object
+        Page<LoanApplication> resultPage = (Page<LoanApplication>) response.getBody();
+        assertEquals(1, resultPage.getContent().size());
+        assertEquals(testApplication, resultPage.getContent().get(0));
+        
+        verify(loanApplicationRepository).findAll(any(Pageable.class));
+    }
+
+    @Test
+    void index_shouldFilterByStatus() {
+        Page<LoanApplication> page = new PageImpl<>(Arrays.asList(testApplication));
+        
+        when(loanApplicationRepository.findByStatus(eq("pending"), any(Pageable.class)))
+            .thenReturn(page);
+
+        ResponseEntity<?> response = controller.index("pending", 0, 20);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        
+        Page<LoanApplication> resultPage = (Page<LoanApplication>) response.getBody();
+        assertEquals(1, resultPage.getContent().size());
+        
+        verify(loanApplicationRepository).findByStatus(eq("pending"), any(Pageable.class));
+        verify(loanApplicationRepository, never()).findAll(any(Pageable.class));
+    }
+
+    @Test
+    void index_shouldHandleEmptyStatus() {
+        Page<LoanApplication> page = new PageImpl<>(Arrays.asList(testApplication));
+        
+        when(loanApplicationRepository.findAll(any(Pageable.class))).thenReturn(page);
+
+        ResponseEntity<?> response = controller.index("", 0, 20);
+
+        assertEquals(200, response.getStatusCodeValue());
+        verify(loanApplicationRepository).findAll(any(Pageable.class));
+        verify(loanApplicationRepository, never()).findByStatus(anyString(), any(Pageable.class));
+    }
+
+    @Test
+    void index_shouldHandlePaginationParameters() {
+        Page<LoanApplication> page = new PageImpl<>(Arrays.asList(testApplication));
+        
+        when(loanApplicationRepository.findAll(any(Pageable.class))).thenReturn(page);
+
+        ResponseEntity<?> response = controller.index(null, 2, 50);
+
+        assertEquals(200, response.getStatusCodeValue());
+        
+        ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+        verify(loanApplicationRepository).findAll(pageableCaptor.capture());
+        
+        Pageable capturedPageable = pageableCaptor.getValue();
+        assertEquals(2, capturedPageable.getPageNumber());
+        assertEquals(50, capturedPageable.getPageSize());
     }
 
     @Test

@@ -1,13 +1,30 @@
 .sidebar {
   position: fixed;
-  top: 45px; /* Below the navbar */
+  top: 45px;
   left: 0;
   bottom: 0;
   width: 190px;
   background-color: #2e3842;
   z-index: 100;
   overflow-y: auto;
+  overflow-x: hidden;
   transition: all 0.2s;
+}
+
+.sidebar.menu-min {
+  width: 43px;
+}
+
+.sidebar.menu-min .menu-text {
+  display: none !important; 
+}
+
+.sidebar.menu-min .arrow {
+  display: none !important; 
+}
+
+.sidebar.menu-min .nav-list > li > a {
+  padding-left: 12px; 
 }
 
 .sidebar .nav-list {
@@ -55,9 +72,16 @@
 /* Main content offset */
 .main-content {
   margin-left: 190px;
+  margin-top: 45px;
   padding: 20px;
   min-height: 100vh;
   background-color: #f5f5f5;
+  transition: margin-left 0.3s ease; /* Add this */
+}
+
+/* Add this for expanded state */
+.main-content.expanded {
+  margin-left: 43px;
 }
 
 /* Responsive */

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.adminapplicationmaster.domain.entity.LoanApplication;
 import com.adminapplicationmaster.repository.LoanApplicationRepository;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -23,11 +23,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/v1/dashboard")
+@AllArgsConstructor
 @Slf4j
 public class ApiDashboardController {
 
-    @Autowired
-    private LoanApplicationRepository loanApplicationRepository;
+    private final LoanApplicationRepository loanApplicationRepository;
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> index() {

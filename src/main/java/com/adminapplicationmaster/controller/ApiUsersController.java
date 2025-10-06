@@ -3,7 +3,6 @@ package com.adminapplicationmaster.controller;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +18,7 @@ import com.adminapplicationmaster.domain.entity.User;
 import com.adminapplicationmaster.repository.UserRepository;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -27,14 +27,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/v1/users")
+@AllArgsConstructor
 @Slf4j
 public class ApiUsersController {
 
-    @Autowired
-    private UserRepository userRepository;
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping
     public ResponseEntity<List<User>> index() {
@@ -53,6 +51,12 @@ public class ApiUsersController {
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody User user) {
         try {
+            // Check if email already exists
+            if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+                return ResponseEntity.status(400)
+                        .body(Map.of("errors", "Email already exists"));
+            }
+            
             // Set default password if not provided
             if (user.getEncryptedPassword() == null || user.getEncryptedPassword().isEmpty()) {
                 user.setEncryptedPassword(passwordEncoder.encode("12345678"));
@@ -61,10 +65,11 @@ public class ApiUsersController {
             }
             
             User saved = userRepository.save(user);
+            log.info("User created successfully: {}", saved.getEmail());
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
-            log.error("Error creating user", e);
-            return ResponseEntity.unprocessableEntity()
+            log.error("Error creating user: {}", e.getMessage(), e);
+            return ResponseEntity.status(400)
                     .body(Map.of("errors", e.getMessage()));
         }
     }

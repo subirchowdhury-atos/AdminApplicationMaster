@@ -1,45 +1,44 @@
 import { useState } from 'react';
 import { locationApi } from '../../api/locationApi';
-import FlashMessage from '../common/FlashMessage';
+import '../../styles/LoanApplicationForm.css';
 
-/**
- * Address Eligibility Component
- * Replaces Rails _address_eligibility.html.erb partial
- */
 function AddressEligibility({ onAddressVerified }) {
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
-  const [flashMessage, setFlashMessage] = useState(null);
-  const [flashType, setFlashType] = useState('info');
+  const [message, setMessage] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!address.trim()) {
-      setFlashMessage('Please enter an address');
-      setFlashType('warning');
+      setMessage({ type: 'error', text: 'Please enter an address' });
       return;
     }
 
     setLoading(true);
+    setMessage(null);
+
     try {
       const response = await locationApi.checkAddress(address);
       
-      if (response.data) {
-        setFlashMessage('Address is eligible');
-        setFlashType('success');
-        // Pass the verified address back to parent component
+      if (response) {
+        setMessage({ type: 'success', text: 'Address is eligible!' });
         if (onAddressVerified) {
-          onAddressVerified(response.data);
+          onAddressVerified(response);
         }
       }
     } catch (error) {
-      if (error.response?.status === 404) {
-        setFlashMessage('Address not eligible');
-        setFlashType('error');
+      // The error.message contains the actual message from the API
+      const errorMessage = error.message || 'Unknown error';
+      
+      // "Address Not found" is not really an error - it's just ineligible
+      if (errorMessage.includes('Address Not found') || 
+          errorMessage.includes('Address not found') ||
+          errorMessage.includes('not eligible')) {
+        setMessage({ type: 'info', text: errorMessage });
       } else {
-        setFlashMessage('Location service error');
-        setFlashType('error');
+        // Actual service errors
+        setMessage({ type: 'error', text: errorMessage });
       }
     } finally {
       setLoading(false);
@@ -47,44 +46,36 @@ function AddressEligibility({ onAddressVerified }) {
   };
 
   return (
-    <div className="row widget-box">
-      <div className="widget-header">
-        <h4 className="widget-title">Address Details</h4>
-      </div>
-      <div className="col-xs-12">
-        <div className="widget-body">
-          <div className="widget-main">
-            {flashMessage && (
-              <FlashMessage
-                message={flashMessage}
-                type={flashType}
-                duration={5000}
-                onClose={() => setFlashMessage(null)}
-              />
-            )}
-            
-            <form className="form-inline" onSubmit={handleSubmit}>
-              <input
-                type="text"
-                name="address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="col-xs-5 col-sm-3"
-                placeholder="Address"
-                required
-                disabled={loading}
-              />
-              <button 
-                type="submit" 
-                className="btn btn-info btn-sm"
-                disabled={loading}
-              >
-                {loading ? 'Checking...' : 'Submit'}
-              </button>
-            </form>
-          </div>
+    <div className="form-section">
+      <h3>Address Details</h3>
+      
+      {message && (
+        <div className={`alert alert-${message.type}`}>
+          {message.text}
         </div>
-      </div>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <div className="address-search-group">
+          <input
+            type="text"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Enter property address"
+            disabled={loading}
+          />
+          <button 
+            type="submit" 
+            className="address-search-btn"
+            disabled={loading}
+          >
+            {loading ? 'Checking...' : 'Submit'}
+          </button>
+        </div>
+        <span className="help-text">
+          Enter the full property address to check eligibility
+        </span>
+      </form>
     </div>
   );
 }

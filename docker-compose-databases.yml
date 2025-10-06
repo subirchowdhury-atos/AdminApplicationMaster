@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  admin-postgres:
+    image: postgres:15
+    container_name: admin-app-postgres
+    environment:
+      POSTGRES_DB: admin_app_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - admin-data:/var/lib/postgresql/data
+
+  location-postgres:
+    image: postgres:15-alpine
+    container_name: location-service-postgres
+    environment:
+      POSTGRES_DB: location_service_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - location-data:/var/lib/postgresql/data
+
+  decision-postgres:
+    image: postgres:16-alpine
+    container_name: decision-service-postgres
+    environment:
+      POSTGRES_DB: decision_service_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - decision-data:/var/lib/postgresql/data
+
+volumes:
+  admin-data:
+  location-data:
+  decision-data:

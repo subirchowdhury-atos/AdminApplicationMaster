@@ -2,7 +2,6 @@ package com.adminapplicationmaster.service;
 
 import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,14 +20,17 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class ApplicationEmailService {
-    
-    @Autowired
-    private JavaMailSender mailSender;
-    @Autowired
-    private TemplateEngine templateEngine;
+
+    private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
     
     @Value("${app.mail.default-from:from@example.com}")
     private String defaultFromAddress;
+
+    public ApplicationEmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+    }
     
     /**
      * Send simple text email

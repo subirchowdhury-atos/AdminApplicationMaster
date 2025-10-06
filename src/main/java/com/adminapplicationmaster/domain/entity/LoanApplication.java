@@ -7,11 +7,12 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -58,9 +59,8 @@ public class LoanApplication {
 
     @NotBlank(message = "SSN is required")
     @Column(name = "ssn", nullable = false)
-    // @Convert(converter = com.adminapplicationmaster.config.EncryptionConverter.class)
-    @JsonIgnore
-    private String ssn; //todo: encrypt this and fix seed data
+    @Convert(converter = com.adminapplicationmaster.config.EncryptionConverter.class)
+    private String ssn;
 
     @NotBlank(message = "Email is required")
     @Column(name = "email", nullable = false)
@@ -83,12 +83,12 @@ public class LoanApplication {
     @Column(name = "status")
     private String status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "address_id", nullable = false)
     @JsonIgnoreProperties({"loanApplications"})
     private Address address;
 
-    @OneToMany(mappedBy = "loanApplication", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "loanApplication", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnoreProperties({"loanApplication"})
     private List<ApplicationDecision> applicationDecisions;
 
@@ -114,5 +114,13 @@ public class LoanApplication {
             return applicationDecisions.get(applicationDecisions.size() - 1);
         }
         return null;
+    }
+
+    @JsonProperty("ssnDisplay")
+    public String getSsnDisplay() {
+        if (ssn != null && ssn.length() >= 4) {
+            return "***-**-" + ssn.substring(ssn.length() - 4);
+        }
+        return "***-**-****";
     }
 }

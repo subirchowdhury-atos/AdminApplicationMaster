@@ -2,7 +2,6 @@ package com.adminapplicationmaster.controller;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +15,7 @@ import com.adminapplicationmaster.repository.UserRepository;
 import com.adminapplicationmaster.util.JwtUtil;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -23,17 +23,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/users")
+@AllArgsConstructor
 @Slf4j
 public class AuthController {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/sign_in")
     public ResponseEntity<?> signIn(@Valid @RequestBody LoginRequest loginRequest) {

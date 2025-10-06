@@ -20,10 +20,19 @@ function DashboardPage() {
 
   const fetchLoanApplications = async () => {
     try {
-      const response = await loanApplicationApi.getAll();
-      setLoanApplications(response.data);
+      const response = await loanApplicationApi.getAll({ page: 0, size: 100 });
+      
+      // Handle paginated response
+      if (response.data.content) {
+        setLoanApplications(response.data.content);
+      } else if (Array.isArray(response.data)) {
+        setLoanApplications(response.data);
+      } else {
+        setLoanApplications([]);
+      }
     } catch (error) {
       console.error('Error fetching loan applications:', error);
+      setLoanApplications([]); // Set empty array on error
     } finally {
       setLoading(false);
     }

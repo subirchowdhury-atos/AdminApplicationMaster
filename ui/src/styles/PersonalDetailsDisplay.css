@@ -1,0 +1,44 @@
+/* Personal Details Display Styles */
+.personal-details-display {
+  background: white;
+  border-radius: 4px;
+  padding: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.details-section h3 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 20px;
+  margin-top: 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #5087b9;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row label {
+  width: 200px;
+  min-width: 200px;
+  font-weight: 600;
+  color: #555;
+  font-size: 14px;
+}
+
+.detail-value {
+  flex: 1;
+  color: #333;
+  font-size: 14px;
+  padding-left: 15px;
+}

@@ -1,19 +1,11 @@
 // ========================================
-// LoanApplicationsPage.jsx (index)
+// LoanApplicationsPage.jsx 
 // ========================================
 import LoanApplicationsTable from '../components/loan-applications/LoanApplicationsTable';
 
 function LoanApplicationsPage() {
   return (
-    <div className="main-content-inner">
-      <div className="page-content">
-        <div className="row">
-          <div className="col-xs-12">
-            <LoanApplicationsTable />
-          </div>
-        </div>
-      </div>
-    </div>
+    <LoanApplicationsTable />
   );
 }
 

@@ -1,45 +1,50 @@
-// ========================================
-// UsersTable.jsx
-// ========================================
 import { Link } from 'react-router-dom';
+import '../../styles/UsersPage.css';
 
 function UsersTable({ users }) {
   return (
-    <div>
-      <h3>Listing Users</h3>
-      <Link to="/users/new" className="btn btn-info pull-right">
-        New User
-      </Link>
-      <table className="table table-bordered table-hover" id="simple-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.length === 0 ? (
+    <div className="users-page">
+      <div className="page-header">
+        <h3>Listing Users</h3>
+        <Link to="/users/new" className="new-user-btn">
+          New User
+        </Link>
+      </div>
+
+      <div className="table-container">
+        <table className="users-table">
+          <thead>
             <tr>
-              <td colSpan="6" className="text-center">No users found</td>
+              <th>ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Role</th>
             </tr>
-          ) : (
-            users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.firstName}</td>
-                <td>{user.lastName}</td>
-                <td>{user.email}</td>
-                <td>{user.contact}</td>
-                <td>{user.role}</td>
+          </thead>
+          <tbody>
+            {users.length === 0 ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: 'center' }}>
+                  No users found
+                </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              users.map((user) => (
+                <tr key={user.id}>
+                  <td>{user.id}</td>
+                  <td>{user.firstName}</td>
+                  <td>{user.lastName}</td>
+                  <td>{user.email}</td>
+                  <td>{user.contact}</td>
+                  <td>{user.role}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

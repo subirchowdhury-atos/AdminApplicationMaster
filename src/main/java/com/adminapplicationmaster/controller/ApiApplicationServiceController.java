@@ -1,10 +1,11 @@
 package com.adminapplicationmaster.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.adminapplicationmaster.domain.entity.ApplicationDecision;
@@ -25,6 +27,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -32,24 +35,39 @@ import lombok.extern.slf4j.Slf4j;
  * Requires JWT authentication
  */
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/v1/application_services")
 @Slf4j
 public class ApiApplicationServiceController {
 
-    @Autowired
-    private LoanApplicationRepository loanApplicationRepository;
-    @Autowired
-    private ApplicationDecisionRepository applicationDecisionRepository;
-    @Autowired
-    private DecisionService decisionService;
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final LoanApplicationRepository loanApplicationRepository;
+    private final ApplicationDecisionRepository applicationDecisionRepository;
+    private final DecisionService decisionService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping
     @Transactional(readOnly = true)
-    public ResponseEntity<List<LoanApplication>> index() {
-        List<LoanApplication> loanApplications = loanApplicationRepository.findAll();
-        return ResponseEntity.ok(loanApplications);
+    public ResponseEntity<?> index(
+        @RequestParam(required = false) String status,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "20") int size) {
+        
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<LoanApplication> loanApplicationsPage;
+            
+            if (status != null && !status.isEmpty()) {
+                loanApplicationsPage = loanApplicationRepository.findByStatus(status, pageable);
+            } else {
+                loanApplicationsPage = loanApplicationRepository.findAll(pageable);
+            }
+            
+            return ResponseEntity.ok(loanApplicationsPage);
+        } catch (Exception e) {
+            log.error("Error fetching loan applications", e);
+            return ResponseEntity.status(500)
+                    .body(Map.of("error", "Failed to fetch loan applications"));
+        }
     }
 
     @PostMapping
@@ -80,12 +98,29 @@ public class ApiApplicationServiceController {
                     existing.setFirstName(loanApplication.getFirstName());
                     existing.setLastName(loanApplication.getLastName());
                     existing.setDateOfBirth(loanApplication.getDateOfBirth());
-                    existing.setSsn(loanApplication.getSsn());
                     existing.setEmail(loanApplication.getEmail());
                     existing.setPhone(loanApplication.getPhone());
                     existing.setIncome(loanApplication.getIncome());
                     existing.setIncomeType(loanApplication.getIncomeType());
                     existing.setRequestedLoanAmount(loanApplication.getRequestedLoanAmount());
+                    
+                    // Only update SSN if it's provided and not masked
+                    if (loanApplication.getSsn() != null && 
+                        !loanApplication.getSsn().startsWith("X") && 
+                        !loanApplication.getSsn().startsWith("*")) {
+                        existing.setSsn(loanApplication.getSsn());
+                    }
+                    
+                    // Only update address if provided
+                    if (loanApplication.getAddress() != null) {
+                        existing.setAddress(loanApplication.getAddress());
+                    }
+                    // Note: address is NOT updated if null - keeps existing value
+                    
+                    // Only update status if provided
+                    if (loanApplication.getStatus() != null) {
+                        existing.setStatus(loanApplication.getStatus());
+                    }
                     
                     LoanApplication updated = loanApplicationRepository.save(existing);
                     return ResponseEntity.ok(updated);
@@ -93,6 +128,7 @@ public class ApiApplicationServiceController {
                 .orElseGet(() -> ResponseEntity.unprocessableEntity()
                         .body(Map.of("errors", "Loan application not found")));
     }
+
 
     @GetMapping("/{id}/decision_check")
     public ResponseEntity<?> decisionCheck(@PathVariable Long id) {

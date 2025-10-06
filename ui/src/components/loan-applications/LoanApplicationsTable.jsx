@@ -2,45 +2,40 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { loanApplicationApi } from '../../api/loanApplicationApi';
 import { getStatusClass, capitalize } from '../../utils/helpers';
+import '../../styles/LoanApplicationsPage.css';
 
-/**
- * Loan Applications Table Component
- * Replaces Rails _table.html.erb partial
- */
 function LoanApplicationsTable() {
   const [loanApplications, setLoanApplications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({ page: 1, totalPages: 1 });
   const [searchParams, setSearchParams] = useSearchParams();
   
   const statusFilter = searchParams.get('status_search') || '';
-  const currentPage = parseInt(searchParams.get('page') || '1');
 
   useEffect(() => {
     fetchLoanApplications();
-  }, [statusFilter, currentPage]);
+  }, [statusFilter]);
 
   const fetchLoanApplications = async () => {
     setLoading(true);
     try {
       const params = {
-        page: currentPage - 1, // Spring Boot uses 0-based pagination
+        page: 0,
         size: 20
       };
       
       if (statusFilter) {
         params.status = statusFilter;
       }
-
-      const response = await loanApplicationApi.getAll(params);
-      setLoanApplications(response.data.content || response.data);
       
-      // Handle pagination if backend returns it
-      if (response.data.totalPages) {
-        setPagination({
-          page: response.data.number + 1,
-          totalPages: response.data.totalPages
-        });
+      const response = await loanApplicationApi.getAll(params);
+      
+      // Handle paginated response
+      if (response.data.content) {
+        setLoanApplications(response.data.content);
+        // Optional: store pagination info for later use
+        // setPagination({ total: response.data.totalElements, pages: response.data.totalPages });
+      } else {
+        setLoanApplications(response.data);
       }
     } catch (error) {
       console.error('Error fetching loan applications:', error);
@@ -50,154 +45,96 @@ function LoanApplicationsTable() {
   };
 
   const handleStatusSearch = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const status = formData.get('status_search');
-    
-    const newParams = {};
+    const status = e.target.value;
     if (status) {
-      newParams.status_search = status;
+      setSearchParams({ status_search: status });
+    } else {
+      setSearchParams({});
     }
-    newParams.page = '1'; // Reset to first page on new search
-    
-    setSearchParams(newParams);
-  };
-
-  const handlePageChange = (page) => {
-    const newParams = Object.fromEntries(searchParams);
-    newParams.page = page.toString();
-    setSearchParams(newParams);
   };
 
   if (loading) {
-    return <div className="text-center p-5">Loading...</div>;
+    return <div className="loading-container">Loading loan applications...</div>;
   }
 
   return (
-    <div>
-      <h3>Loan Applications</h3>
-      <br />
-      
-      <div className="row">
-        <div className="col-xs-3 no-padding-left">
-          <form className="form-search" onSubmit={handleStatusSearch}>
-            <div className="input-group">
-              <select 
-                name="status_search" 
-                className="form-control search-query"
-                defaultValue={statusFilter}
-              >
-                <option value="">Select</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-              </select>
-              <span className="input-group-btn">
-                <button type="submit" className="btn btn-info btn-sm">
-                  <i className="fa fa-search"></i> Search
-                </button>
-              </span>
-            </div>
-          </form>
-        </div>
-        
-        <Link 
-          to="/loan-applications/new" 
-          className="btn btn-info btn-sm pull-right"
-        >
+    <div className="loan-applications-page">
+      <div className="page-header">
+        <h1>Loan Applications</h1>
+        <Link to="/loan-applications/new" className="create-btn">
           Create New Application
         </Link>
       </div>
 
-      <table className="table table-bordered table-hover" id="simple-table">
-        <thead>
-          <tr>
-            <th>Application ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loanApplications.length === 0 ? (
+      <div className="search-section">
+        <div className="search-form">
+          <select 
+            value={statusFilter}
+            onChange={handleStatusSearch}
+          >
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="table-container">
+        <table className="applications-table">
+          <thead>
             <tr>
-              <td colSpan="7" className="text-center">No loan applications found</td>
+              <th>Application ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-          ) : (
-            loanApplications.map((application) => (
-              <tr key={application.id}>
-                <td>{application.id}</td>
-                <td>{application.firstName}</td>
-                <td>{application.lastName}</td>
-                <td>{application.email}</td>
-                <td>{application.phone}</td>
-                <td>
-                  <span className={`label label-sm label-${getStatusClass(application.status)} arrowed-in`}>
-                    {capitalize(application.status)}
-                  </span>
-                </td>
-                <td>
-                  <div className="hidden-sm hidden-xs btn-group">
-                    <Link 
-                      to={`/loan-applications/${application.id}`}
-                      className="btn btn-xs btn-success"
-                    >
-                      <span className="ace-icon fa fa-check bigger-120">Show</span>
-                    </Link>
-                  </div>
-                  <div className="hidden-sm hidden-xs btn-group">
-                    <Link 
-                      to={`/loan-applications/${application.id}/edit`}
-                      className="btn btn-xs btn-info"
-                    >
-                      <span className="ace-icon fa fa-pencil bigger-120">Edit</span>
-                    </Link>
-                  </div>
+          </thead>
+          <tbody>
+            {loanApplications.length === 0 ? (
+              <tr>
+                <td colSpan="7" style={{ textAlign: 'center' }}>
+                  No loan applications found
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-
-      {/* Pagination */}
-      {pagination.totalPages > 1 && (
-        <nav aria-label="Page navigation">
-          <ul className="pagination">
-            <li className={pagination.page === 1 ? 'disabled' : ''}>
-              <a 
-                href="#" 
-                onClick={(e) => { e.preventDefault(); handlePageChange(pagination.page - 1); }}
-              >
-                Previous
-              </a>
-            </li>
-            
-            {[...Array(pagination.totalPages)].map((_, index) => (
-              <li key={index + 1} className={pagination.page === index + 1 ? 'active' : ''}>
-                <a 
-                  href="#" 
-                  onClick={(e) => { e.preventDefault(); handlePageChange(index + 1); }}
-                >
-                  {index + 1}
-                </a>
-              </li>
-            ))}
-            
-            <li className={pagination.page === pagination.totalPages ? 'disabled' : ''}>
-              <a 
-                href="#" 
-                onClick={(e) => { e.preventDefault(); handlePageChange(pagination.page + 1); }}
-              >
-                Next
-              </a>
-            </li>
-          </ul>
-        </nav>
-      )}
+            ) : (
+              loanApplications.map((application) => (
+                <tr key={application.id}>
+                  <td>{application.id}</td>
+                  <td>{application.firstName}</td>
+                  <td>{application.lastName}</td>
+                  <td>{application.email}</td>
+                  <td>{application.phone}</td>
+                  <td>
+                    <span className={`status-label status-${application.status.toLowerCase()}`}>
+                      {capitalize(application.status)}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      <Link 
+                        to={`/loan-applications/${application.id}`}
+                        className="btn-action btn-show"
+                      >
+                        Show
+                      </Link>
+                      <Link 
+                        to={`/loan-applications/${application.id}/edit`}
+                        className="btn-action btn-edit"
+                      >
+                        Edit
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
