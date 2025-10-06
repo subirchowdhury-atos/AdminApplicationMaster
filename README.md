@@ -261,20 +261,21 @@ cd ui
 npm run build 
 npm run dev
 ```
-## AdminApplicationMaster
+## Application Credentials
+### AdminApplicationMaster
 DATABASE_URL=jdbc:postgresql://prod-host:5432/admin_db
 SECRET_KEY_BASE=your-secret-key
 ENCRYPTION_KEY=your-encryption-key
 LOCATION_SERVICE_HOST=http://location-service:8081
 DECISION_SERVICE_HOST=http://decision-service:8082
 
-## LocationServiceMaster
+### LocationServiceMaster
 REDIS_HOST=redis-host
 REDIS_PORT=6379
 DATABASE_URL=jdbc:postgresql://prod-host:5433/location_db
 
-## DecisionServiceMaster
+### DecisionServiceMaster
 DATABASE_URL=jdbc:postgresql://prod-host:5434/decision_db
 
-## DecisionServiceMaster
+### DecisionServiceMaster
 DATABASE_URL=jdbc:postgresql://prod-host:5434/decision_db
