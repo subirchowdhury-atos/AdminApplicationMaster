@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { userApi } from '../api/userApi';
 import UsersTable from '../components/users/UsersTable';
+import '../styles/UsersPage.css';
 
 function UsersPage() {
   const [users, setUsers] = useState([]);

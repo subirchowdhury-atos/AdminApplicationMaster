@@ -1,276 +1,166 @@
-# Admin Application Master
-
-A comprehensive loan application management system built with Spring Boot and React. This system integrates with LocationMaster for address validation and DecisionServiceMaster for loan decision processing.
-
-## System Architecture
-
-The application consists of three interconnected services:
-
-1. **LocationMaster** - Validates addresses and determines eligible locations
-2. **DecisionServiceMaster** - Processes loan applications and makes lending decisions
-3. **AdminApplicationMaster** - Main application for managing loan applications
-   - Backend: Spring Boot REST API
-   - Frontend: React (Vite)
-   - Database: PostgreSQL (Docker)
-
-## Prerequisites
-
-- Java 17 or higher
-- Node.js 18+ and npm
-- Docker and Docker Compose
-- Maven 3.6+
-
-## Project Dependency Structure
-
-```
-.
-├── LocationMaster/           # Address validation service
-├── DecisionServiceMaster/    # Loan decision service
-└── AdminApplicationMaster/   # Main application
-    ├── src/                  # Spring Boot backend
-    └── ui/                   # React frontend
-```
-
-## Getting Started
-
-### Step 1: Start LocationMaster
-
-```bash
-# Terminal 1: Navigate to LocationMaster
-cd LocationMaster
-
-# Start PostgreSQL container
-docker-compose up -d
-
-# Start Spring Boot application
-./mvnw spring-boot:run
-# or
-mvn spring-boot:run
-```
-
-**Service will be available at:** `http://localhost:8081`
-
----
-
-### Step 2: Start DecisionServiceMaster
-
-```bash
-# Terminal 2: Navigate to DecisionServiceMaster
-cd DecisionServiceMaster
-
-# Start PostgreSQL container
-docker-compose up -d
-
-# Start Spring Boot application
-./mvnw spring-boot:run
-# or
-mvn spring-boot:run
-```
-
-**Service will be available at:** `http://localhost:8082`
-
----
-
-### Step 3: Start AdminApplicationMaster Backend
-
-```bash
-# Terminal 3: Navigate to AdminApplicationMaster
-cd AdminApplicationMaster
-
-# Start PostgreSQL container
-docker-compose up -d
-
-# Start Spring Boot application
-./mvnw spring-boot:run
-# or
-mvn spring-boot:run
-```
-
-**Backend API will be available at:** `http://localhost:8080`
-
----
-
-### Step 4: Start AdminApplicationMaster Frontend
-
-```bash
-# Terminal 4: Navigate to UI folder
-cd AdminApplicationMaster/ui
-
-# Install dependencies (first time only)
-npm install
-
-# Start development server
-npm run dev
-```
-
-**Frontend UI will be available at:** `http://localhost:3000`
-
----
-
-## Access the Application
-
-Open your browser and navigate to:
-```
-http://localhost:3000
-```
-
-### Test Credentials
-
-```
-Email: admin@example.com
-Password: password123
-```
-
----
-
-## Configuration
-
-### Environment Variables
-
-Each service requires proper configuration. Check the following files:
-
-**LocationMaster:**
-- `src/main/resources/application.properties`
-
-**DecisionServiceMaster:**
-- `src/main/resources/application.properties`
-
-**AdminApplicationMaster Backend:**
-- `src/main/resources/application.properties`
-- Ensure encryption key is set: `encryption.key=your-32-character-secret-key`
-
-**AdminApplicationMaster Frontend:**
-- `ui/.env`
-```env
-VITE_API_BASE_URL=http://localhost:8080
-```
-
----
-
-## Database Setup
-
-Each service uses its own PostgreSQL database running in Docker. The databases are automatically initialized with seed data on first startup.
-
-### Seed Data
-
-The AdminApplicationMaster includes sample loan applications with test users and addresses from eligible and non-eligible locations.
-
----
-
-## Features
-
-- **User Authentication** - JWT-based authentication with role-based access control
-- **Loan Application Management** - Create, read, update loan applications
-- **Address Validation** - Integration with LocationMaster to validate eligible addresses
-- **Loan Decision Processing** - Integration with DecisionServiceMaster for automated decisions
-- **SSN Encryption** - Automatic encryption/decryption of sensitive data
-- **Dashboard** - Visual analytics and application tracking
-
----
-
-## API Documentation
-
-### AdminApplicationMaster Endpoints
-
-#### Authentication
-- `POST /api/v1/auth/login` - User login
-- `POST /api/v1/auth/register` - User registration
-
-#### Loan Applications
-- `GET /api/v1/application_services` - List all applications (with pagination)
-- `POST /api/v1/application_services` - Create new application
-- `GET /api/v1/application_services/{id}` - Get application by ID
-- `PUT /api/v1/application_services/{id}` - Update application
-- `GET /api/v1/application_services/{id}/decision_check` - Run decision check
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-**Port Already in Use:**
-- Ensure no other services are running on ports 8080, 8081, 8082, or 3000
-- Kill any existing processes: `lsof -ti:8080 | xargs kill -9`
-
-**Database Connection Errors:**
-- Verify Docker containers are running: `docker ps`
-- Check Docker logs: `docker logs <container-name>`
-- Restart containers: `docker-compose restart`
-
-**CORS Errors:**
-- Ensure `SecurityConfig.java` has proper CORS configuration
-- Verify `axios.js` includes `withCredentials: true`
-
-**SSN Not Displaying:**
-- Check that SSN encryption migration ran successfully in application logs
-- Verify encryption key is properly configured
-
----
-
-## Stopping the Applications
-
-To stop all services:
-
-```bash
-# Stop each Spring Boot application (Ctrl+C in each terminal)
-
-# Stop and remove Docker containers
-cd LocationMaster && docker-compose down
-cd DecisionServiceMaster && docker-compose down
-cd AdminApplicationMaster && docker-compose down
-
-# Stop frontend
-# Ctrl+C in the UI terminal
-```
-
----
-
-## Development
-
-### Building for Production
-
-**Backend:**
-```bash
-cd AdminApplicationMaster
-./mvnw clean package
-java -jar target/admin-application-master-0.0.1-SNAPSHOT.jar
-```
-
-**Frontend:**
-```bash
-cd AdminApplicationMaster/ui
-npm run build
-# Output will be in ui/dist/
-```
-
----
-
-## Technology Stack
-
-### Backend
-- Spring Boot 3.x
-- Spring Security
-- Spring Data JPA
-- PostgreSQL
-- JWT Authentication
-- Docker
-
-### Frontend
-- React 18
-- React Router
-- Axios
-- Vite
-- CSS3
-
----
-
-## License
-
-This project is proprietary and confidential.
-
----
-
-## Support
-
-For issues or questions, please contact the development team.
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-box {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.login-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 40px 30px;
+  text-align: center;
+}
+
+.login-header i {
+  font-size: 48px;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.login-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.login-body {
+  padding: 40px 30px;
+}
+
+.login-body form {
+  margin-top: 30px;
+}
+
+.login-body h4 {
+  color: #333;
+  font-size: 18px;
+  margin-bottom: 30px;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* CRITICAL: Make form-group relative and clear any inherited styles */
+.login-page .form-group {
+  margin-bottom: 20px !important;
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* CRITICAL: Position label absolutely inside the form-group */
+.login-page .form-group label {
+  position: absolute !important;
+  left: 15px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #666 !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+  width: 20px !important;
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.login-page .form-group label i {
+  font-size: 16px !important;
+}
+
+/* CRITICAL: Style the input with proper padding */
+.login-page .form-group input,
+.login-page .form-group .form-control {
+  width: 100% !important;
+  padding: 15px 15px 15px 48px !important;
+  border: 2px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  font-size: 15px !important;
+  transition: all 0.3s !important;
+  box-sizing: border-box !important;
+  background-color: #fff !important;
+  height: 50px !important;
+  line-height: normal !important;
+  display: block !important;
+  margin: 0 !important;
+}
+
+.login-page .form-group input:focus,
+.login-page .form-group .form-control:focus {
+  outline: none !important;
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+}
+
+.login-page .form-group input::placeholder,
+.login-page .form-group .form-control::placeholder {
+  color: #bbb !important;
+}
+
+.login-page .form-actions {
+  margin-top: 30px;
+}
+
+.login-page .btn-primary {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.login-page .btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.login-page .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+}
+
+.login-footer p {
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-container {
+    max-width: 100%;
+  }
+  
+  .login-body {
+    padding: 30px 20px;
+  }
+}
